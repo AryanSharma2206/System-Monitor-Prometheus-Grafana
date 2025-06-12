@@ -1,0 +1,131 @@
+Terminal --1
+
+sudo apt update && sudo apt upgrade -y
+sudo apt install wget curl git ufw net-tools -y
+mkdir ~/security-alert-dashboard
+cd ~/security-alert-dashboard
+cd ~/security-alert-dashboard
+wget https://github.com/prometheus/prometheus/releases/download/v2.52.0/prometheus-2.52.0.linux-amd64.tar.gz
+tar -xvf prometheus-*.tar.gz
+mv prometheus-2.52.0.linux-amd64 prometheus
+cd prometheus
+
+Keep it running...........
+
+
+Terminal --2
+
+
+cd ~/security-alert-dashboard
+wget https://github.com/prometheus/node_exporter/releases/download/v1.8.0/node_exporter-1.8.0.linux-amd64.tar.gz
+tar xvf node_exporter-*.tar.gz
+mv node_exporter-1.8.0.linux-amd64 node_exporter
+cd node_exporter
+./node_exporter
+
+Keep it running..........
+
+
+Terminal  ---3
+
+
+mkdir ~/security-alert-dashboard/custom_exporters
+cd ~/security-alert-dashboard/custom_exporters
+nano failed_logins.sh
+
+---
+#!/bin/bash
+fail_count=$(grep "Failed password" /var/log/auth.log | wc -l)
+echo "# HELP failed_ssh_logins Total failed SSH login attempts"
+echo "# TYPE failed_ssh_logins gauge"
+echo "failed_ssh_logins $fail_count"
+---
+
+chmod +x failed_logins.sh
+
+nano security_exporter.py
+--------
+
+from http.server import BaseHTTPRequestHandler, HTTPServer
+import subprocess
+
+class Handler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        if self.path == '/metrics':
+            result = subprocess.run(["./failed_logins.sh"], capture_output=True, text=True)
+            self.send_response(200)
+            self.send_header("Content-type", "text/plain")
+            self.end_headers()
+            self.wfile.write(result.stdout.encode())
+
+server = HTTPServer(('0.0.0.0', 9000), Handler)
+print("Exporter running on http://localhost:9000/metrics")
+server.serve_forever()
+------------------------
+python3 security_exporter.py
+
+
+Keep it running..................
+
+
+back to Terminal ---1
+
+stop the current process  -\
+
+
+
+cd ~/security-alert-dashboard/prometheus
+nano prometheus.yml
+
+------------
+scrape_configs:
+  - job_name: 'node_exporter'
+    static_configs:
+      - targets: ['localhost:9100']
+
+  - job_name: 'security_exporter'
+    static_configs:
+      - targets: ['localhost:9000']
+---------------
+
+pkill prometheus
+./prometheus --config.file=prometheus.yml
+
+
+
+
+Terminal ---------4
+
+sudo apt install -y software-properties-common
+sudo add-apt-repository "deb https://packages.grafana.com/oss/deb stable main"
+wget -q -O - https://packages.grafana.com/gpg.key | sudo apt-key add -
+sudo apt update
+sudo apt install grafana -y
+
+sudo systemctl start grafana-server
+sudo systemctl enable grafana-server
+
+access  grafana dashboard ---
+ http://localhost:3000
+
+
+Next Step ------on browser 
+
+
+Connect Prometheus to Grafana
+Go to Grafana > Settings > Data Sources > Add Data Source
+
+Choose Prometheus
+
+URL: http://localhost:9090
+
+Save & Test
+
+
+
+
+
+
+
+
+
