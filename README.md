@@ -26,6 +26,14 @@ A fully self-hosted **Linux-based system monitoring dashboard** using **Promethe
 | Linux         | Hosting environment                 |
 
 ---
+---
+
+**Aryan Sharma**  
+B.Tech CSE (AI & DS) | Poornima University  
+GitHub: [@AryanSharma2206](https://github.com/AryanSharma2206)  
+LinkedIn: [linkedin.com/in/aryan-sharma2206](https://www.linkedin.com/in/aryan-sharma-a2a240353/)  
+Location: Jaipur, India
+---
 
 ## 📁 Project Structure
 
@@ -38,12 +46,5 @@ security-alert-dashboard/
 └── README.md                   # Project documentation
 
 
----
 
-**Aryan Sharma**  
-B.Tech CSE (AI & DS) | Poornima University  
-GitHub: [@AryanSharma2206](https://github.com/AryanSharma2206)  
-LinkedIn: [linkedin.com/in/aryan-sharma2206](https://www.linkedin.com/in/aryan-sharma-a2a240353/)  
-Location: Jaipur, India
----
 
